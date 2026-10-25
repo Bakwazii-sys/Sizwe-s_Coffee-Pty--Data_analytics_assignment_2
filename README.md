@@ -52,3 +52,62 @@ NULL Handling - Prevents inaccurate calculations and divide-by-zero errors
 
 Date Functions - Analyzes financial years and monthly trends
 
+📌 Key insights:
+
+The business continues to deliver strong year-on-year growth, supported by solid sales execution and predictable seasonal demand patterns. However, growth is increasingly concentrated in specific channels and product categories, creating both profitability and cash-flow risks. The greatest opportunities lie in improving collections management, refining the sales mix, and strengthening commercial engagement with key wholesale customers.
+
+Revenue Growth and Channel Performance
+
+Revenue growth remains healthy, with both Wholesale and Subscription channels achieving approximately 8.8% year-on-year growth. Despite similar growth rates, Wholesale remains the dominant channel, generating roughly 2.3 times more revenue than Subscription. This highlights the business's heavy reliance on Wholesale as its primary source of revenue and future growth.
+
+Profitability Driven by Product Mix
+
+Profitability is influenced not only by sales volume but also by product mix. House Blend generates the highest gross profit in absolute terms.
+Single Origin delivers the highest gross margin percentage. This demonstrates that the most profitable product on a margin basis is not necessarily the largest contributor to overall profit. Product volume and sales mix remain critical drivers of total profitability.
+
+Collections and Cash-Flow Risk
+
+One of the most significant operational concerns is the concentration of unpaid invoices within the Wholesale channel.
+
+Key findings include:
+
+Wholesale accounts for nearly all of the ~R88.6 million outstanding balance.
+Average payment settlement in Wholesale is 68.7 days, compared with only 3.8 days in Subscription.
+
+These figures indicate a clear credit control weakness and create a meaningful cash-flow risk despite strong revenue growth. Reducing overdue balances and improving payment collection discipline should be a strategic priority.
+
+Customer Concentration and Commercial Opportunities
+
+Customer revenue is concentrated among a small number of large accounts.
+
+Halvane Retail Group is the largest customer in FY2025 by revenue.
+Major Wholesale customers including Umhlanga Fresh, Ridgeway Foods, and Kalahari Kitchen generate substantial revenue but have not received trade promotion support.
+
+These accounts represent potential opportunities for targeted commercial initiatives, such as rebates, promotional funding, or listing support, which could strengthen relationships and unlock additional growth.
+
+Sales Team Performance
+
+Sales execution is a clear strength of the business.
+16 out of 18 sales representatives exceeded 100% of their monthly targets.
+Several representatives achieved more than 220% of target, demonstrating exceptional performance.
+Overall, the sales team is consistently outperforming expectations and contributing strongly to revenue growth.
+
+Seasonal Demand Patterns
+
+The business exhibits a highly predictable seasonal sales cycle. Sales typically increase from January through June. Sales decline from July through December.
+June is consistently the strongest month and December is consistently the weakest month. The repeatability of this pattern provides a valuable advantage for forecasting, inventory planning, staffing, and cash-flow management.
+
+Margin Decline Explained
+
+The decline in overall margin is not being driven by deteriorating profitability within individual product lines. In fact, margins across product categories have remained stable or improved slightly. The primary issue is a shift in revenue mix toward Bulk Commercial products, which carry the lowest margins.
+
+📌 Conclusion
+
+The business is performing well, with strong revenue growth, excellent sales execution, and predictable seasonal demand. However, growth is increasingly driven by lower-margin product categories and accompanied by a significant concentration of payment risk within the Wholesale channel. Addressing collections performance, improving the revenue mix, and developing high-value wholesale accounts represent the most impactful opportunities to enhance profitability and sustain long-term growth.
+
+However, the business should focus on three areas:
+
+Strengthen collections and credit control to reduce Wholesale payment risk and improve cash flow.
+Optimise channel and product mix by encouraging growth in higher-margin products and channels.
+Leverage targeted promotions and account support for large Wholesale customers that currently receive little or no trade investment.
+Overall Conclusion
