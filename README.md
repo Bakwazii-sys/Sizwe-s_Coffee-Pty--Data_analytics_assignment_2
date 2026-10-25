@@ -31,14 +31,24 @@ What factors contributed to the decline in gross margin from FY2024 to FY2025?
 
 📌 Skills Demonstrated
 The project applies a range of SQL techniques to solve business problems and generate actionable insights.
+
 SQL Technique	→ Business Application
+
 INNER JOIN - Integrates customer, order, sales, and product data
+
 LEFT JOIN	- Retains customers or sales representatives without matching records
+
 CASE Expressions - Calculates revenue, profitability, and invoice metrics
+
 Aggregate Functions - (SUM, AVG, COUNT)	Classifies financial years and performs conditional calculations
+
 Common Table Expressions - (CTEs)	Streamlines complex, multi-step calculations
+
 Window Functions - Calculates month-over-month growth and rolling averages
+
 Ranking and Sorting - Identifies leading customers and sales representatives
+
 NULL Handling - Prevents inaccurate calculations and divide-by-zero errors
+
 Date Functions - Analyzes financial years and monthly trends
 
