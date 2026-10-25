@@ -1,8 +1,8 @@
 #Sizwe's Coffee Analysis Project
 
-_________________________________________________________________________________________
----Task 1:Channel performance 
-_________________________________________________________________________________________
+__________________________________________________________________________________________________________________________________________________________________
+Task 1:Channel performance 
+__________________________________________________________________________________________________________________________________________________________________
 
 WITH channel_revenue AS (
     SELECT
@@ -12,16 +12,8 @@ WITH channel_revenue AS (
             ELSE 'FY2025'
         END AS financial_year,
         SUM(sl.line_revenue) AS revenue
-    FROM read_files(
-        '/Volumes/workspace/default/da/sizwe_sales_orders.csv',
-        format => 'csv',
-        header => true
-    ) so
-    JOIN read_files(
-        '/Volumes/workspace/default/da/sizwe_sales_lines.csv',
-        format => 'csv',
-        header => true
-    ) sl
+    FROM workspace.default.sales_orders so
+    JOIN workspace.default.sales_lines sl
         ON so.order_id = sl.order_id
     GROUP BY so.channel,
              CASE
@@ -49,52 +41,49 @@ SELECT
 FROM channel_revenue
 GROUP BY channel;
 
-channel,fy2024_revenue,fy2025_revenue,growth_rate_pct
-Subscription,132833985.15000054,144573698.33000088,8.84
-Wholesale,308166012.3199981,335426325.02000153,8.85
+Findings: Answer
+channel	fy2024_revenue	fy2025_revenue	growth_rate_pct
+Wholesale	308166012.3200077	335426325.0200068	8.85
+Subscription	132833985.1499977	144573698.33000264	8.84
 
-|channel|fy2024_revenue|fy2025_revenue|growth_rate_pct|
-|---|---|---|---|
-|Subscription|132833985.15000054|144573698.33000088|8.84|
-|Wholesale|308166012.3199981|335426325.02000153|8.85|
+Answer: Both channels grew ~8.8% year over year; Wholesale remains the dominant channel at roughly 2.3× Subscription's revenue. 
+The data spans exactly 2023-07-01 → 2025-06-27, so the fiscal-year split cleanly covers both periods.
 
-Both channels grew ~8.8% year over year; Wholesale remains the dominant channel at roughly 2.3× Subscription's revenue. The data spans exactly 2023-07-01 → 2025-06-27, so the fiscal-year split cleanly covers both periods.
-
-__________________________________________________________________________________________________________
+______________________________________________________________________________________________________________________________________________________________
 Task 2: Where the profit actually comes from
-__________________________________________________________________________________________________________
+______________________________________________________________________________________________________________________________________________________________
+
+WITH line_detail AS (
+    SELECT
+        p.product_line,
+        sl.line_revenue,
+        sl.cogs
+    FROM workspace.default.sales_lines sl
+    JOIN workspace.default.products p
+        ON sl.sku = p.sku
+)
 SELECT
-    p.product_line,
-    SUM(sl.line_revenue) AS revenue,
-    SUM(sl.cogs) AS cost_of_goods,
-    SUM(sl.line_revenue - sl.cogs) AS gross_profit,
+    product_line,
+    SUM(line_revenue) AS revenue,
+    SUM(cogs) AS cost_of_goods,
+    SUM(line_revenue - cogs) AS gross_profit,
     ROUND(
         (
-            SUM(sl.line_revenue - sl.cogs) * 100.0
+            SUM(line_revenue - cogs) * 100.0
             /
-            NULLIF(SUM(sl.line_revenue), 0)
+            NULLIF(SUM(line_revenue), 0)
         ),
         2
     ) AS gross_margin_pct
-FROM read_files(
-    '/Volumes/workspace/default/da/sizwe_sales_lines.csv',
-    format => 'csv',
-    header => true
-) sl
-JOIN read_files(
-    '/Volumes/workspace/default/da/sizwe_products.csv',
-    format => 'csv',
-    header => true
-) p
-    ON sl.sku = p.sku
-GROUP BY p.product_line
+FROM line_detail
+GROUP BY product_line
 ORDER BY gross_profit DESC;
 
 House Blend earns the most profit, but Single Origin earns the highest margin. So, not the same line earns the highest margin
 
-___________________________________________________________________________________________________________________
+_______________________________________________________________________________________________________________________________________________________________
 Task 3:The collections problem
-___________________________________________________________________________________________________________________
+_______________________________________________________________________________________________________________________________________________________________
 
 WITH invoices AS (
     SELECT
@@ -125,39 +114,51 @@ FROM invoices
 GROUP BY channel
 ORDER BY value_outstanding DESC;
 
-Findings:The problem sits in the Wholesale channel as it holds all but 44 of the open invoices, takes 68.7 days on average to settle versus 3.8 for the Subscription channel, and accounts for essentially all of the ~R88.6M outstanding. Nomsa's suspicion is real, the Wholesale's average settlement time worsened from 56.9 days in FY2024 to 84.1 in FY2025 (paid invoices per year), while Subscription stayed flat at 3.8. I'd investigate Wholesale first, and specifically its large open balance of 3,454 unpaid invoices worth ~R87.8M.
+Findings:The problem sits in the Wholesale channel as it holds all but 44 of the open invoices, takes 68.7 days on average to settle versus 3.8 for the 
+Subscription channel, and accounts for essentially all of the ~R88.6M outstanding. Nomsa's suspicion is real, the Wholesale's average settlement time 
+worsened from 56.9 days in FY2024 to 84.1 in FY2025 (paid invoices per year), while Subscription stayed flat at 3.8. I'd investigate Wholesale first, 
+and specifically its large open balance of 3,454 unpaid invoices worth ~R87.8M.
 
-________________________________________________________________________________________________________________________________________
+_________________________________________________________________________________________________________________________________________________________
 Task 4:The ten accounts that matter most 
-_________________________________________________________________________________________________________________________________________
+_________________________________________________________________________________________________________________________________________________________
 
+WITH fy2025_customer_lines AS (
+    SELECT
+        c.trading_name,
+        c.segment,
+        c.province,
+        r.rep_name,
+        sl.line_revenue
+    FROM customers c
+    JOIN sales_orders so
+        ON c.customer_id = so.customer_id
+    JOIN sales_lines sl
+        ON so.order_id = sl.order_id
+    LEFT JOIN reps r
+        ON c.rep_id = r.rep_id
+    WHERE so.order_date > '2024-06-30'
+)
 SELECT
-    c.trading_name AS customer_name,
-    c.segment,
-    c.province,
-    r.rep_name,
-    SUM(sl.line_revenue) AS fy2025_revenue
-FROM customers c
-JOIN sales_orders so
-    ON c.customer_id = so.customer_id
-JOIN sales_lines sl
-    ON so.order_id = sl.order_id
-LEFT JOIN reps r
-    ON c.rep_id = r.rep_id
-WHERE so.order_date > '2024-06-30'
+    trading_name AS customer_name,
+    segment,
+    province,
+    rep_name,
+    SUM(line_revenue) AS fy2025_revenue
+FROM fy2025_customer_lines
 GROUP BY
-    c.trading_name,
-    c.segment,
-    c.province,
-    r.rep_name
+    trading_name,
+    segment,
+    province,
+    rep_name
 ORDER BY fy2025_revenue DESC
 LIMIT 10;
 
 Findings: Bongani's one-pager is ready. It shows Halvane Retail Group as the largest customer dominating with the most highest revenue. 
 
-_____________________________________________________________________________________________________________________________________________
+____________________________________________________________________________________________________________________________________________________________
 Task 5:A commercial gap
-_____________________________________________________________________________________________________________________________________________
+____________________________________________________________________________________________________________________________________________________________
 
 WITH customer_revenue AS (
     SELECT
@@ -190,7 +191,8 @@ WHERE tp.customer_id IS NULL
 ORDER BY cr.revenue DESC
 LIMIT 15;
 
-Findings:Umhlanga Fresh, Ridgeway Foods and Kalahari Kitchen Given these three accounts spend R6.2- R4.4M with Sizwe yet have never received a cent of promotional support. I would have their reps propose a targeted volume rebate / listing support package in the coming quarter.
+Findings:Umhlanga Fresh, Ridgeway Foods and Kalahari Kitchen Given these three accounts spend R6.2- R4.4M with Sizwe yet have never received a cent of 
+promotional support. I would have their reps propose a targeted volume rebate / listing support package in the coming quarter.
 
 ________________________________________________________________________________________________________________________________________________________________
 Task 6:Are the sales representatives hitting target?
@@ -221,11 +223,12 @@ LEFT JOIN fy2025_revenue fr
     ON r.rep_id = fr.rep_id
 ORDER BY pct_of_target DESC;
 
-Findings:16 of 18 reps are above 100% of their monthly target with the top four (Karabo van Wyk, Kagiso Mkhize, Johan Maluleke, Anele Naidoo) blowing past 220%, peaking at 250%
+Findings:16 of 18 reps are above 100% of their monthly target with the top four (Karabo van Wyk, Kagiso Mkhize, Johan Maluleke, Anele Naidoo) 
+blowing past 220%, peaking at 250%
 
-___________________________________________________________________________________________________________________________________________________________________________
+_____________________________________________________________________________________________________________________________________________________________
 Task 7: The shape of the year 
-___________________________________________________________________________________________________________________________________________________________________________
+_____________________________________________________________________________________________________________________________________________________________
 WITH monthly_revenue AS (
     SELECT
         DATE_FORMAT(so.order_date, 'yyyy-MM-01') AS month_start,
@@ -266,9 +269,9 @@ December is the quietest month about R30M, versus about R45M in June. That's rou
 It happens every year, Dec 2023 fell 13%, Dec 2024 fell 12.9% which is almost identical.
 Overall the business is growing: each June peak is ~9% higher than the last.
 
-______________________________________________________________________________________________________________________________________________________
+__________________________________________________________________________________________________________________________________________________________
 Task 8:Why has the margin moved?
-______________________________________________________________________________________________________________________________________________________
+___________________________________________________________________________________________________________________________________________________________
 
 WITH product_year_metrics AS (
     SELECT
@@ -308,6 +311,10 @@ FROM product_year_metrics
 ORDER BY product_line, financial_year;
 
 
-Findings:No product line got less profitable — every line's margin was flat or slightly up (Bulk Commercial 19.89% to 19.91%, House Blend 38.32% to 38.34%, Single Origin 44.24% to 44.31%). '
-The decline is entirely a mix shift: Bulk Commercial, the lowest-margin line at ~19.9%, grew revenue by R51.2M (+46%, 110.3M to 161.5M) and jumped from 25.02% to 33.65% of total revenue, while all four higher-margin lines (35.8%–44.3%) shrank in share. House Blend 32.14% to 28.71%, Single Origin 19.45% to 17.57%, Capsules 12.88% to 10.84%, Decaf 10.50% to 9.24%. Weighting each year's shares by its margins reproduces the headline exactly: 34.7% blended in FY2024 falling to 33.0% in FY2025. 
+Findings:No product line got less profitable — every line's margin was flat or slightly up (Bulk Commercial 19.89% to 19.91%, House Blend 38.32% to 38.34%, 
+Single Origin 44.24% to 44.31%). '
+The decline is entirely a mix shift: Bulk Commercial, the lowest-margin line at ~19.9%, grew revenue by R51.2M (+46%, 110.3M to 161.5M) and 
+jumped from 25.02% to 33.65% of total revenue, while all four higher-margin lines (35.8%–44.3%) shrank in share. House Blend 32.14% to 28.71%, 
+Single Origin 19.45% to 17.57%, Capsules 12.88% to 10.84%, Decaf 10.50% to 9.24%. Weighting each year's shares by its margins reproduces 
+the headline exactly: 34.7% blended in FY2024 falling to 33.0% in FY2025. 
 In short, Sizwe bought its 9% revenue growth by selling a lot more low-margin bulk coffee and slightly less of everything else. 
